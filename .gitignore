@@ -1,0 +1,22 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+data/
+
+# Local secrets and app state
+.env.*
+!.env.example
+.bridge.local.json
+.bridge/
+*token*
+*secret*
+*.pem
+*.key
+
+# WorkBuddy bridge state is stored outside this repo; keep local reports/tasks private if desired
+handoff/inbox/*
+!handoff/inbox/README.md
+handoff/sent/
+handoff/reports/*.json
+# Keep Markdown reports/STATUS under version control; task replies may contain internal source details.

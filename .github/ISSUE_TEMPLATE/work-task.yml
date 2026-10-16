@@ -1,0 +1,34 @@
+name: WorkBuddy Development Task
+description: Create a traceable task for the Manju Studio development workflow.
+title: "[Task]: "
+labels: ["workbuddy-task"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: One concrete goal for this task.
+      placeholder: Describe the outcome, not a broad project wish.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Allowed and forbidden scope
+      description: Name modules that may be edited and modules that must not be changed.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Observable behaviour and exact tests.
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety constraints
+      value: "Do not expose secrets. Do not delete user data. Do not deploy or incur paid API usage without explicit approval. Report only tests actually run."
+    validations:
+      required: true

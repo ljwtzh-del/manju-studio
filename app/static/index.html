@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>漫剧工坊 Studio</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">漫</div><div><strong>漫剧工坊</strong><small>STUDIO · LOCAL MVP</small></div></div>
+      <div class="side-label">制作空间</div>
+      <button class="nav-item active" data-tab="board">▦ <span>导演台 / 分镜</span></button>
+      <button class="nav-item" data-tab="assets">▧ <span>资产库</span></button>
+      <button class="nav-item" data-tab="generate">✦ <span>生成引擎</span></button>
+      <button class="nav-item" data-tab="post">◫ <span>后期合成</span></button>
+      <div class="sidebar-spacer"></div>
+      <div class="engine-status"><span class="status-dot" id="health-dot"></span><div><strong>本机引擎状态</strong><small id="health-summary">正在检查服务…</small></div></div>
+      <div class="sidebar-foot">独立制作模块 · 不修改现有项目管理层</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar"><div><div class="eyebrow">AI CREATIVE PIPELINE</div><h1 id="page-title">导演台与分镜</h1></div><div class="topbar-right"><span class="pill"><span class="live-dot"></span> 本地工作区</span><button class="btn btn-secondary" id="refresh-btn">↻ 刷新</button></div></header>
+      <section class="project-strip"><div class="project-select-wrap"><label for="project-select">当前项目</label><select id="project-select"></select></div><div class="project-meta" id="project-meta">场景、关键帧、视频、音频资产按项目隔离</div><button class="btn btn-primary" id="new-project-btn">＋ 新建项目</button></section>
+
+      <section class="tab-panel active" id="tab-board">
+        <div class="section-heading"><div><h2>镜头分镜板</h2><p>先确认镜头内容与关键帧，再提交批量生成；失败可单镜头重试。</p></div><button class="btn btn-primary" id="new-shot-btn">＋ 新建镜头</button></div>
+        <div class="workflow-rail"><div class="rail-step done"><span>1</span>资产准备</div><div class="rail-line"></div><div class="rail-step active"><span>2</span>导演台 / 关键帧</div><div class="rail-line"></div><div class="rail-step"><span>3</span>视频生成</div><div class="rail-line"></div><div class="rail-step"><span>4</span>配音与合成</div></div>
+        <div class="board-layout"><div id="shots-list" class="shots-list"></div><aside class="editor-panel"><div class="panel-head"><div><div class="eyebrow">SHOT INSPECTOR</div><h3 id="editor-title">选择一个镜头</h3></div><span id="shot-state" class="state-badge">未选择</span></div>
+          <div id="empty-editor" class="empty-state"><div class="empty-icon">✳</div><strong>选择镜头开始制作</strong><p>每个镜头保存独立提示词、关键帧、首尾帧和视频版本。</p></div>
+          <div id="shot-editor" class="hidden">
+            <label>镜头标题<input id="shot-title" /></label><label>场景 / 走位<textarea id="shot-scene" rows="2"></textarea></label>
+            <label>关键帧生图提示词<textarea id="shot-image-prompt" rows="4" placeholder="画面构图、角色、景别、光线、风格…"></textarea></label>
+            <label>视频动作提示词<textarea id="shot-motion-prompt" rows="4" placeholder="动作顺序、镜头运动、表情变化、时长…"></textarea></label>
+            <div class="editor-actions"><button class="btn btn-secondary" id="save-shot-btn">保存镜头</button><button class="btn btn-primary" id="to-generate-btn">生成关键帧 →</button></div>
+            <div class="keyframe-preview" id="keyframe-preview"><span>暂无关键帧</span></div>
+          </div>
+        </aside></div>
+      </section>
+
+      <section class="tab-panel" id="tab-assets">
+        <div class="section-heading"><div><h2>资产库</h2><p>角色设定、场景参考、道具、关键帧、视频、配音、BGM 与字幕统一收纳。</p></div></div>
+        <div class="upload-card"><div class="upload-icon">↥</div><div class="upload-copy"><strong>导入本地资产</strong><p>支持 PNG/JPG/WebP、MP4/MOV、WAV/MP3、SRT/ASS 和 ComfyUI JSON 工作流。</p></div><input type="file" id="asset-file" multiple /><select id="asset-kind"><option value="auto">自动识别类型</option><option value="image">图片 / 角色 / 场景</option><option value="video">视频片段</option><option value="voice">配音</option><option value="bgm">BGM</option><option value="subtitle">字幕</option><option value="workflow">工作流 JSON</option></select><button class="btn btn-primary" id="upload-btn">上传资产</button></div>
+        <div id="asset-grid" class="asset-grid"></div>
+      </section>
+
+      <section class="tab-panel" id="tab-generate">
+        <div class="section-heading"><div><h2>生成引擎</h2><p>ComfyUI 负责图片；Agnes 视频 API 可选。Pavo 网页会员不自动等于 API 权限。</p></div></div>
+        <div class="engine-grid">
+          <div class="engine-card"><div class="engine-card-top"><div class="engine-logo comfy">C</div><div><h3>ComfyUI · 文生图 / 图生图</h3><p id="comfy-status">未检测</p></div></div><div class="field-row"><label>ComfyUI URL<input id="comfy-url" placeholder="http://127.0.0.1:8188" /></label><button class="btn btn-secondary" id="test-comfy-btn">测试连接</button></div><label>API 格式工作流 JSON<textarea id="workflow-json" rows="8" placeholder="在 ComfyUI 中使用 Save (API Format) 导出 JSON，然后粘贴到这里。工作流不绑定某个固定 checkpoint。"></textarea></label><label>正向提示词<textarea id="engine-prompt" rows="3" placeholder="高质量漫剧画面提示词…"></textarea></label><label>负向提示词<textarea id="engine-negative" rows="2" placeholder="低质量、畸形手指、文字水印、重复人物…"></textarea></label><div class="field-grid"><label>正向提示词节点<input id="map-prompt" placeholder="例如 6.text" /></label><label>负向提示词节点<input id="map-negative" placeholder="例如 7.text" /></label><label>Seed 节点<input id="map-seed" placeholder="例如 3.seed" /></label><label>画布宽高节点<input id="map-size" placeholder="例如 5.width, 5.height" /></label></div><button class="btn btn-primary full-btn" id="run-comfy-btn">提交 ComfyUI 生图任务</button><p class="hint">节点映射格式：节点 ID.输入字段。不同工作流节点 ID 不同，必须按自己的 API JSON 配置；提交后可查看任务结果并导入资产库。</p><div id="comfy-result" class="result-box hidden"></div></div>
+          <div class="engine-card"><div class="engine-card-top"><div class="engine-logo agnes">A</div><div><h3>Agnes · 图生视频 / 首尾帧</h3><p id="agnes-status">API 未检测</p></div></div><label>镜头提示词<textarea id="agnes-prompt" rows="4" placeholder="人物开始状态、动作节奏、镜头运动和结束状态…"></textarea></label><label>首帧图片 URL<input id="agnes-first" placeholder="需要是 Agnes 服务可访问的 URL" /></label><label>尾帧图片 URL<input id="agnes-last" placeholder="可选；关键帧模式的桥接终点" /></label><div class="field-grid"><label>时长（秒）<select id="agnes-seconds"><option>4</option><option selected>5</option><option>6</option><option>8</option><option>10</option><option>12</option></select></label><label>分辨率<select id="agnes-size"><option>720P</option><option>1080P</option><option>1K</option><option>2K</option></select></label><label>画幅<select id="agnes-ratio"><option>9:16</option><option>16:9</option><option>3:4</option><option>4:3</option><option>1:1</option></select></label><label>模式<select id="agnes-mode"><option value="keyframe">首尾帧 / 关键帧</option><option value="text">文生视频</option></select></label></div><button class="btn btn-primary full-btn" id="run-agnes-btn">提交 Agnes 视频任务</button><p class="hint">需要配置 AGNES_API_KEY。资产库上传视频也可进入后期合成，不依赖 API 任务是否已接通。</p><div id="agnes-result" class="result-box hidden"></div></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="tab-post">
+        <div class="section-heading"><div><h2>后期合成台</h2><p>统一帧率与画幅、控制边界帧、混合配音和 BGM、烧录字幕，输出 MP4。</p></div></div>
+        <div class="post-grid"><div class="engine-card"><h3>① 选择视频片段</h3><p class="hint">按时间线顺序选择视频资产；当前按所选顺序串接。</p><div id="render-video-list" class="check-list"></div><div class="field-grid"><label>画幅<select id="render-size"><option value="1080x1920" selected>竖屏 1080×1920</option><option value="720x1280">竖屏 720×1280</option><option value="1920x1080">横屏 1920×1080</option><option value="1280x720">横屏 1280×720</option></select></label><label>帧率<select id="render-fps"><option>24</option><option>25</option><option selected>30</option><option>50</option><option>60</option></select></label></div><label>边界帧策略<select id="frame-policy"><option value="none">不裁剪（普通拼接）</option><option value="dedupe1" selected>去重 1 帧（相邻首帧重复）</option><option value="boundary2">尾部退 2 帧 + 下一段去重首帧</option></select></label><div class="hint-box"><strong>边界帧策略说明</strong><p>“尾部退 2 帧”适合实测有末尾停顿/异常帧的模型。若生成 B 时没有使用 A 的实际尾帧作为首帧参考，不建议机械启用。</p></div></div>
+          <div class="engine-card"><h3>② 配音、BGM 与字幕</h3><label>配音资产<select id="voice-select"><option value="">不添加配音</option></select></label><label>BGM 资产<select id="bgm-select"><option value="">不添加 BGM</option></select></label><label>BGM 音量<select id="bgm-volume"><option value="-24">-24 dB · 很轻</option><option value="-18" selected>-18 dB · 推荐起点</option><option value="-14">-14 dB</option><option value="-10">-10 dB · 较响</option></select></label><label>SRT / ASS 字幕资产<select id="subtitle-select"><option value="">不烧录字幕</option></select></label><label>字幕样式<input id="subtitle-style" value="FontName=Microsoft YaHei,FontSize=22,Outline=2,Shadow=1,Alignment=2,MarginV=72" /></label><button class="btn btn-primary full-btn" id="render-btn">开始合成 MP4</button><div id="render-result" class="result-box hidden"></div></div></div>
+        <div class="engine-card jobs-card"><div class="panel-head"><h3>本项目任务记录</h3><button class="btn btn-secondary" id="refresh-jobs-btn">刷新任务</button></div><div id="jobs-list" class="jobs-list"></div></div>
+      </section>
+      <footer class="app-footer">漫剧工坊 MVP · 本地开发骨架 · 生产环境需增加账号权限、任务队列、云存储与审计日志</footer>
+    </main>
+  </div>
+  <dialog id="project-dialog"><form method="dialog" id="project-form"><div class="dialog-head"><h2>新建漫剧项目</h2><button class="icon-btn" value="cancel">×</button></div><label>项目名称<input id="new-project-name" required placeholder="例如：夜行档案 · 第 01 集" /></label><label>项目说明<textarea id="new-project-description" rows="3" placeholder="题材、画风、画幅与制作要求"></textarea></label><div class="dialog-actions"><button class="btn btn-secondary" value="cancel">取消</button><button class="btn btn-primary" id="create-project-submit" value="default">创建项目</button></div></form></dialog>
+  <dialog id="shot-dialog"><form method="dialog" id="shot-form"><div class="dialog-head"><h2>新建镜头</h2><button class="icon-btn" value="cancel">×</button></div><label>镜头标题<input id="new-shot-title" required placeholder="例如：女主近景 · 抬眼" /></label><label>场景 / 走位<textarea id="new-shot-scene" rows="2"></textarea></label><label>关键帧生图提示词<textarea id="new-shot-image" rows="3"></textarea></label><label>视频动作提示词<textarea id="new-shot-motion" rows="3"></textarea></label><div class="dialog-actions"><button class="btn btn-secondary" value="cancel">取消</button><button class="btn btn-primary" id="create-shot-submit" value="default">创建镜头</button></div></form></dialog>
+  <div class="toast" id="toast"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
